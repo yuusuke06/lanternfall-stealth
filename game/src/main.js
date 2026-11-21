@@ -29,6 +29,9 @@ const game = {
   elapsed: 0,
   levelTime: 0,
   seenThisLevel: false,
+  storySeen: false,
+  storyIndex: 0,
+  storyLatch: false,
   timesSpotted: 0,
   shotMode: new URLSearchParams(window.location.search).get('shot'),
   shotLevel: Number(new URLSearchParams(window.location.search).get('level') ?? 0),
@@ -41,6 +44,8 @@ function loadLevel(index) {
   game.guards = game.level.guardDefs.map((definition) => createGuard(definition));
   game.levelTime = 0;
   game.seenThisLevel = false;
+  game.storySeen = false;
+  game.storyIndex = 0;
   game.state = 'playing';
   status.textContent = game.level.name;
 }
@@ -53,6 +58,14 @@ function step(dt) {
   if (game.state !== 'playing') return;
   game.elapsed += dt;
   game.levelTime += dt;
+  // A spirit of the gallery is waiting to be heard: step close and
+  // the museum holds its breath while it tells her its worry.
+  const spirit = game.level.spirit;
+  if (spirit && !game.storySeen && Math.hypot(spirit.x - game.player.x, spirit.y - game.player.y) < 42) {
+    game.state = 'story';
+    game.storyIndex = 0;
+    return;
+  }
   const events = [];
   updatePlayer(game.player, game.level, input, dt, events);
   if (events.some((event) => event.type === 'chime')) sound.moonChime();
@@ -93,6 +106,18 @@ function step(dt) {
 }
 
 function handleStateKeys() {
+  if (game.state === 'story') {
+    if (!input.pressed('enter')) game.storyLatch = false;
+    else if (!game.storyLatch) {
+      game.storyLatch = true;
+      game.storyIndex += 1;
+      if (game.storyIndex >= game.level.spirit.intro.length) {
+        game.storySeen = true;
+        game.state = 'playing';
+      }
+    }
+    return;
+  }
   if (game.state === 'title' && input.pressed('enter')) {
     sound.unlock();
     music.start();

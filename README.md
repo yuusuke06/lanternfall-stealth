@@ -34,6 +34,17 @@ the grand relic she came for above all.
 - The exit door stays locked red until every relic in the gallery is taken,
   then it burns green.
 
+## The spirits of the galleries
+
+Every gallery is haunted, gently. A soul lives in one exhibit of each
+hall — an empty vase, a stopped clock, a bird that cannot fly, and the
+Mother Moon herself. Step close and the museum holds its breath: the
+spirit tells Lune its small worry in a few short lines, in the voice of
+a fairy tale that is quietly philosophical. Taking its treasured moon
+is how she answers; when the gallery is cleared, the spirit says its
+farewell and rests. She is not only stealing the moons. She is setting
+the museum's souls free, one gallery at a time.
+
 ## Music
 
 An original generative score, synthesised live with WebAudio — a felt

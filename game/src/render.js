@@ -281,6 +281,42 @@ function drawGuard(ctx, guard, time) {
   }
 }
 
+// The gallery's spirit: a small, pale soul that haunts its exhibit,
+// drawn as a soft ghost with a wavy hem and a halo of quiet light. It
+// brightens once it has told Lune its worry and been heard.
+function drawSpirit(ctx, spirit, heard, time) {
+  const bob = Math.sin(time * 1.6) * 3;
+  const glow = ctx.createRadialGradient(spirit.x, spirit.y + bob, 2, spirit.x, spirit.y + bob, 30);
+  glow.addColorStop(0, heard ? 'rgba(190, 220, 255, 0.30)' : 'rgba(190, 220, 255, 0.20)');
+  glow.addColorStop(1, 'rgba(190, 220, 255, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(spirit.x - 30, spirit.y + bob - 30, 60, 60);
+  ctx.save();
+  ctx.translate(spirit.x, spirit.y + bob);
+  ctx.fillStyle = heard ? 'rgba(225, 240, 255, 0.92)' : 'rgba(205, 225, 250, 0.78)';
+  ctx.beginPath();
+  ctx.arc(0, -6, 8, Math.PI, 0);
+  ctx.lineTo(8, 8);
+  for (let i = 0; i < 4; i++) {
+    ctx.quadraticCurveTo(6 - i * 4, 4.5, 4 - i * 4, 8);
+  }
+  ctx.lineTo(-8, -6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#31405e';
+  ctx.beginPath();
+  ctx.arc(-3, -6, 1.5, 0, Math.PI * 2);
+  ctx.arc(3, -6, 1.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  if (!heard) {
+    ctx.fillStyle = 'rgba(230, 240, 255, 0.85)';
+    ctx.font = 'bold 13px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('✦', spirit.x, spirit.y - 24 + bob);
+  }
+}
+
 // Dust motes drifting in the lantern light: slow, deterministic, and
 // purely for the room's held breath.
 function drawDustMotes(ctx, time) {
@@ -371,6 +407,7 @@ export function renderGame(ctx, game, time) {
   // by the walls they cannot shine through.
   drawVisionCones(ctx, game.level, game.guards);
   for (const guard of game.guards) drawGuard(ctx, guard, time);
+  if (game.level.spirit) drawSpirit(ctx, game.level.spirit, game.storySeen, time);
   drawPlayer(ctx, game.player, time);
   drawDustMotes(ctx, time);
   drawVignette(ctx);
@@ -416,7 +453,14 @@ function drawOverlay(ctx, game) {
     ctx.fillStyle = '#e8e4d8';
     ctx.font = '18px system-ui, sans-serif';
     ctx.fillText((game.seenThisLevel ? 'Seen, but gone like mist.' : 'Never seen. A rumour with a lantern.') + '  Time ' + clock, width / 2, 330);
-    ctx.fillText('Press ENTER for the next gallery', width / 2, 362);
+    if (game.level.spirit) {
+      ctx.fillStyle = '#bcd3ff';
+      ctx.font = 'italic 17px Georgia, serif';
+      ctx.fillText('「' + game.level.spirit.farewell + '」', width / 2, 366);
+    }
+    ctx.fillStyle = '#e8e4d8';
+    ctx.font = '18px system-ui, sans-serif';
+    ctx.fillText('Press ENTER for the next gallery', width / 2, 400);
   } else if (game.state === 'win') {
     ctx.fillStyle = '#ffd94d';
     ctx.font = 'bold 46px Georgia, serif';
@@ -424,6 +468,35 @@ function drawOverlay(ctx, game) {
     ctx.fillStyle = '#e8e4d8';
     ctx.font = '19px system-ui, sans-serif';
     ctx.fillText(`The museum wakes none the wiser. Time: ${game.elapsed.toFixed(1)}s · Times spotted: ${game.timesSpotted}`, width / 2, 334);
-    ctx.fillText('Press R to play again', width / 2, 372);
+    if (game.level.spirit) {
+      ctx.fillStyle = '#bcd3ff';
+      ctx.font = 'italic 17px Georgia, serif';
+      ctx.fillText('「' + game.level.spirit.farewell + '」', width / 2, 368);
+    }
+    ctx.fillStyle = '#e8e4d8';
+    ctx.font = '19px system-ui, sans-serif';
+    ctx.fillText('Press R to play again', width / 2, 404);
+  } else if (game.state === 'story') {
+    // The dialogue box: the museum dims, and only the spirit speaks.
+    ctx.fillStyle = 'rgba(5, 7, 16, 0.45)';
+    ctx.fillRect(0, 0, width, height);
+    const spirit = game.level.spirit;
+    ctx.fillStyle = 'rgba(10, 14, 30, 0.94)';
+    ctx.fillRect(70, 478, width - 140, 122);
+    ctx.strokeStyle = 'rgba(188, 211, 255, 0.55)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(70, 478, width - 140, 122);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#ffd94d';
+    ctx.font = 'bold 16px system-ui, sans-serif';
+    ctx.fillText(spirit.name, 96, 508);
+    ctx.fillStyle = '#eef3ff';
+    ctx.font = '19px system-ui, sans-serif';
+    ctx.fillText(spirit.intro[game.storyIndex], 96, 548);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#9aa3c0';
+    ctx.font = '13px system-ui, sans-serif';
+    ctx.fillText('ENTER ▸', width - 92, 584);
+    ctx.textAlign = 'center';
   }
 }

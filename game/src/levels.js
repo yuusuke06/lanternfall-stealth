@@ -15,6 +15,16 @@ export const LEVELS = [
   {
     name: 'Gallery I — First Moon',
     hint: 'WASD / arrows to move · SHIFT run (loud) · C sneak · CLICK throw a coin',
+    spirit: {
+      name: 'つぼの せいれい',
+      col: 18, row: 8,
+      intro: [
+        'わたしは からっぽの つぼ。むかしは まいにち、はなが いけてあったの。',
+        'からっぽは さみしいことだと おもってた。でも ね、からっぽだから、つきの ひかりが たまるんだ。',
+        'わたしの たからものを もっていって。からっぽは、まちぼうけの かたち だったんだね。',
+      ],
+      farewell: 'いってらっしゃい。わたしは ここで、つきを まつよ。',
+    },
     coins: 3,
     map: [
       '########################',
@@ -43,6 +53,16 @@ export const LEVELS = [
   {
     name: 'Gallery II — The Long Hall',
     hint: 'Guards check noises. A coin click can pull one off his loop.',
+    spirit: {
+      name: 'とまった とけいの せいれい',
+      col: 12, row: 13,
+      intro: [
+        'ぼくは とまった とけい。じかんは ぼくを おいて、さきへ いっちゃった。',
+        'でも、とまっている あいだも、だれかが わらって、ないて、ここを 通りすぎた。',
+        'じかんは ながれるものじゃなくて、たまるものかも しれない。ぼくの たからもの、もっていって。',
+      ],
+      farewell: 'ぼくの じかんは、きみと いっしょに すこしだけ うごいたよ。',
+    },
     coins: 3,
     map: [
       '########################',
@@ -72,6 +92,16 @@ export const LEVELS = [
   {
     name: 'Gallery III — Lantern Vault',
     hint: 'Five lanterns, four moons. Patience is the master key.',
+    spirit: {
+      name: 'とべない とりの せいれい',
+      col: 11, row: 7,
+      intro: [
+        'あたしは とべない とり。そらは もう、ガラスの むこうがわ。',
+        'でも、ゆめの なかでは まいばん とんでるの。からだは ここでも、ゆめは じゆうだもの。',
+        'じゆうって、ばしょじゃなくて こころの むき なのかも。あたしの たからもの、そらへ つれていって。',
+      ],
+      farewell: 'いってらっしゃい。あたしは ゆめの そらで まってる。',
+    },
     coins: 4,
     map: [
       '########################',
@@ -102,6 +132,16 @@ export const LEVELS = [
   {
     name: 'Gallery IV — The Mother Moon',
     hint: 'Six lanterns, and the Mother Moon watching over her children.',
+    spirit: {
+      name: 'ははなる つきの せいれい',
+      col: 11, row: 6,
+      intro: [
+        'わたしは ははなる つき。この かんの こどもたちを、ずっと みまもってきた。',
+        'けれど、まもることと とじこめることは、にているようで ちがうの。',
+        'だから おねがい、わたしも いっしょに つれていって。はなれることは、きらうことじゃ ないでしょう？',
+      ],
+      farewell: 'ありがとう。まもりつづけた ものが はなれていくのは さみしい。でも、それが あいだと おそわったよ。',
+    },
     coins: 4,
     map: [
       '########################',
@@ -156,6 +196,9 @@ export function parseLevel(definition) {
   return {
     name: definition.name,
     hint: definition.hint,
+    spirit: definition.spirit
+      ? { ...definition.spirit, x: definition.spirit.col * 40 + 20, y: definition.spirit.row * 40 + 20 }
+      : null,
     coins: definition.coins,
     map: definition.map,
     solid,
