@@ -16,14 +16,14 @@ export const LEVELS = [
     name: 'Gallery I — First Moon',
     hint: 'WASD / arrows to move · SHIFT run (loud) · C sneak · CLICK throw a coin',
     spirit: {
-      name: 'つぼの せいれい',
+      name: 'Spirit of the Empty Vase',
       col: 18, row: 8,
       intro: [
-        'わたしは からっぽの つぼ。むかしは まいにち、はなが いけてあったの。',
-        'からっぽは さみしいことだと おもってた。でも ね、からっぽだから、つきの ひかりが たまるんだ。',
-        'わたしの たからものを もっていって。からっぽは、まちぼうけの かたち だったんだね。',
+        'I am an empty vase. Long ago, someone filled me with fresh flowers every day.',
+        'I thought being empty was a lonely thing. But listen — it is because I am empty that the moonlight can gather inside me.',
+        'Take my treasured moon with you. Being empty was not a lack. It was a shape for waiting.',
       ],
-      farewell: 'いってらっしゃい。わたしは ここで、つきを まつよ。',
+      farewell: 'Go safely. I will stay here, and wait for the moon.',
     },
     coins: 3,
     map: [
@@ -54,14 +54,14 @@ export const LEVELS = [
     name: 'Gallery II — The Long Hall',
     hint: 'Guards check noises. A coin click can pull one off his loop.',
     spirit: {
-      name: 'とまった とけいの せいれい',
+      name: 'Spirit of the Stopped Clock',
       col: 12, row: 13,
       intro: [
-        'ぼくは とまった とけい。じかんは ぼくを おいて、さきへ いっちゃった。',
-        'でも、とまっている あいだも、だれかが わらって、ないて、ここを 通りすぎた。',
-        'じかんは ながれるものじゃなくて、たまるものかも しれない。ぼくの たからもの、もっていって。',
+        'I am a clock that stopped. Time left me behind and hurried on ahead.',
+        'But while I was stopped, people still laughed here, and cried here, and passed me by.',
+        'Perhaps time is not a river that flows. Perhaps it is a jar that fills. Take my treasured moon with you.',
       ],
-      farewell: 'ぼくの じかんは、きみと いっしょに すこしだけ うごいたよ。',
+      farewell: 'My time moved a little today — the part of it I spent with you.',
     },
     coins: 3,
     map: [
@@ -93,14 +93,14 @@ export const LEVELS = [
     name: 'Gallery III — Lantern Vault',
     hint: 'Five lanterns, four moons. Patience is the master key.',
     spirit: {
-      name: 'とべない とりの せいれい',
+      name: 'Spirit of the Flightless Bird',
       col: 11, row: 7,
       intro: [
-        'あたしは とべない とり。そらは もう、ガラスの むこうがわ。',
-        'でも、ゆめの なかでは まいばん とんでるの。からだは ここでも、ゆめは じゆうだもの。',
-        'じゆうって、ばしょじゃなくて こころの むき なのかも。あたしの たからもの、そらへ つれていって。',
+        'I am a bird that cannot fly. The sky is only on the other side of the glass now.',
+        'But every night, in my dreams, I am flying. My body stays here, yet my dreams are free.',
+        'Perhaps freedom is not a place. It is the way a heart faces. Take my treasured moon to the sky for me.',
       ],
-      farewell: 'いってらっしゃい。あたしは ゆめの そらで まってる。',
+      farewell: 'Go safely. I will be waiting in the sky of my dreams.',
     },
     coins: 4,
     map: [
@@ -133,14 +133,14 @@ export const LEVELS = [
     name: 'Gallery IV — The Mother Moon',
     hint: 'Six lanterns, and the Mother Moon watching over her children.',
     spirit: {
-      name: 'ははなる つきの せいれい',
+      name: 'Spirit of the Mother Moon',
       col: 11, row: 6,
       intro: [
-        'わたしは ははなる つき。この かんの こどもたちを、ずっと みまもってきた。',
-        'けれど、まもることと とじこめることは、にているようで ちがうの。',
-        'だから おねがい、わたしも いっしょに つれていって。はなれることは、きらうことじゃ ないでしょう？',
+        'I am the Mother Moon. I have watched over the children of this museum for a very long time.',
+        'But to protect and to imprison — they look alike, and they are not the same.',
+        'So please, take me with you too. To let go is not the same as to stop loving, is it?',
       ],
-      farewell: 'ありがとう。まもりつづけた ものが はなれていくのは さみしい。でも、それが あいだと おそわったよ。',
+      farewell: 'Thank you. It is lonely when what you protected leaves you. But you taught me — that, too, is love.',
     },
     coins: 4,
     map: [

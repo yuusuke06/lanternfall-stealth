@@ -456,7 +456,7 @@ function drawOverlay(ctx, game) {
     if (game.level.spirit) {
       ctx.fillStyle = '#bcd3ff';
       ctx.font = 'italic 17px Georgia, serif';
-      ctx.fillText('「' + game.level.spirit.farewell + '」', width / 2, 366);
+      ctx.fillText('“' + game.level.spirit.farewell + '”', width / 2, 366);
     }
     ctx.fillStyle = '#e8e4d8';
     ctx.font = '18px system-ui, sans-serif';
@@ -471,7 +471,7 @@ function drawOverlay(ctx, game) {
     if (game.level.spirit) {
       ctx.fillStyle = '#bcd3ff';
       ctx.font = 'italic 17px Georgia, serif';
-      ctx.fillText('「' + game.level.spirit.farewell + '」', width / 2, 368);
+      ctx.fillText('“' + game.level.spirit.farewell + '”', width / 2, 368);
     }
     ctx.fillStyle = '#e8e4d8';
     ctx.font = '19px system-ui, sans-serif';
@@ -490,13 +490,24 @@ function drawOverlay(ctx, game) {
     ctx.fillStyle = '#ffd94d';
     ctx.font = 'bold 16px system-ui, sans-serif';
     ctx.fillText(spirit.name, 96, 508);
-    ctx.fillStyle = '#eef3ff';
-    ctx.font = '19px system-ui, sans-serif';
-    ctx.fillText(spirit.intro[game.storyIndex], 96, 548);
     ctx.textAlign = 'right';
     ctx.fillStyle = '#9aa3c0';
     ctx.font = '13px system-ui, sans-serif';
-    ctx.fillText('ENTER ▸', width - 92, 584);
+    ctx.fillText('ENTER ▸', width - 92, 508);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#eef3ff';
+    ctx.font = '19px system-ui, sans-serif';
+    // Word-wrap the spirit's line to the box, up to three lines.
+    const words = spirit.intro[game.storyIndex].split(' ');
+    const wrapped = [];
+    let line = '';
+    for (const word of words) {
+      const trial = line ? line + ' ' + word : word;
+      if (ctx.measureText(trial).width > width - 200 && line) { wrapped.push(line); line = word; }
+      else line = trial;
+    }
+    if (line) wrapped.push(line);
+    wrapped.slice(0, 3).forEach((text, i) => ctx.fillText(text, 96, 540 + i * 25));
     ctx.textAlign = 'center';
   }
 }
