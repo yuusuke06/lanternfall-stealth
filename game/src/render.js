@@ -1,0 +1,353 @@
+// Drawing the night museum: lamplit floor, wooden crates and brick
+// walls you can read at a glance, vision cones that warm from gold to
+// red as a guard's suspicion grows, and a darkness pass that cuts pools
+// of light around lanterns so shadow reads as safety.
+
+import { TILE, COLS, ROWS, HUD_H, COLORS } from './config.js';
+import { buildVisionCone } from './vision.js';
+
+const lightCanvas = document.createElement('canvas');
+
+function coneColor(detection, state) {
+  if (state === 'chase') return 'rgba(255, 70, 50, 0.30)';
+  if (detection > 0.6) return 'rgba(255, 130, 40, 0.28)';
+  if (detection > 0.3) return 'rgba(255, 180, 60, 0.24)';
+  return COLORS.coneCalm;
+}
+
+function drawFloor(ctx, level, time) {
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+      const ch = level.map[row][col];
+      const x = col * TILE;
+      const y = row * TILE;
+      ctx.fillStyle = (col + row) % 2 === 0 ? COLORS.floor : COLORS.floorAlt;
+      ctx.fillRect(x, y, TILE, TILE);
+      if (ch === ',') {
+        ctx.fillStyle = COLORS.rug;
+        ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
+        ctx.strokeStyle = COLORS.rugEdge;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x + 5, y + 5, TILE - 10, TILE - 10);
+      }
+    }
+  }
+}
+
+function drawWallsAndCrates(ctx, level) {
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+      const ch = level.map[row][col];
+      const x = col * TILE;
+      const y = row * TILE;
+      if (ch === '#') {
+        ctx.fillStyle = COLORS.wallSide;
+        ctx.fillRect(x, y, TILE, TILE);
+        ctx.fillStyle = COLORS.wallTop;
+        ctx.fillRect(x, y, TILE, TILE - 9);
+        ctx.fillStyle = COLORS.wall;
+        ctx.fillRect(x + 3, y + 3, TILE - 6, 4);
+        ctx.fillRect(x + 3, y + 13, TILE - 6, 4);
+      } else if (ch === 'C') {
+        ctx.fillStyle = COLORS.crate;
+        ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
+        ctx.strokeStyle = COLORS.crateDark;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x + 4, y + 4, TILE - 8, TILE - 8);
+        ctx.beginPath();
+        ctx.moveTo(x + 4, y + 4);
+        ctx.lineTo(x + TILE - 4, y + TILE - 4);
+        ctx.moveTo(x + TILE - 4, y + 4);
+        ctx.lineTo(x + 4, y + TILE - 4);
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function drawExit(ctx, level, time) {
+  const { x, y } = level.exit;
+  const open = level.relics.every((relic) => relic.taken);
+  const pulse = 0.75 + Math.sin(time * 3) * 0.25;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = open ? COLORS.exitOpen : COLORS.exitLocked;
+  ctx.globalAlpha = open ? pulse : 0.85;
+  ctx.fillRect(-17, -19, 34, 38);
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = '#0b0e17';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(-17, -19, 34, 38);
+  ctx.fillStyle = '#0b0e17';
+  ctx.beginPath();
+  ctx.arc(10, 0, 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 10px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('EXIT', 0, -25);
+  ctx.restore();
+}
+
+function drawRelics(ctx, level, time) {
+  for (const relic of level.relics) {
+    if (relic.taken) continue;
+    const bob = Math.sin(time * 2.4 + relic.phase) * 3;
+    ctx.save();
+    ctx.translate(relic.x, relic.y + bob);
+    ctx.shadowColor = COLORS.relic;
+    ctx.shadowBlur = 14;
+    ctx.fillStyle = COLORS.relic;
+    ctx.beginPath();
+    ctx.moveTo(0, -11);
+    ctx.lineTo(8, 0);
+    ctx.lineTo(0, 11);
+    ctx.lineTo(-8, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#fff3b0';
+    ctx.beginPath();
+    ctx.moveTo(0, -6);
+    ctx.lineTo(4, 0);
+    ctx.lineTo(0, 6);
+    ctx.lineTo(-4, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawCoins(ctx, player) {
+  for (const coin of player.coins) {
+    ctx.fillStyle = '#e8c766';
+    ctx.beginPath();
+    ctx.arc(coin.x, coin.y, 5, 0, Math.PI * 2);
+    ctx.fill();
+    if (coin.ring < 1) {
+      ctx.strokeStyle = `rgba(232, 199, 102, ${0.7 * (1 - coin.ring)})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(coin.x, coin.y, 6 + coin.ring * 46, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+}
+
+function drawVisionCones(ctx, level, guards) {
+  for (const guard of guards) {
+    const cone = buildVisionCone(level, guard);
+    ctx.fillStyle = coneColor(guard.detection, guard.state);
+    ctx.beginPath();
+    ctx.moveTo(cone[0].x, cone[0].y);
+    for (let i = 1; i < cone.length; i++) ctx.lineTo(cone[i].x, cone[i].y);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawPlayer(ctx, player, time) {
+  ctx.save();
+  ctx.translate(player.x, player.y);
+  // Noise ring while running: what the guards hear.
+  if (player.mode === 'run' && player.moving) {
+    ctx.strokeStyle = 'rgba(160, 200, 255, 0.35)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 30 + Math.sin(time * 14) * 5, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.rotate(player.angle);
+  ctx.fillStyle = player.mode === 'sneak' ? COLORS.playerCloakDark : COLORS.playerCloak;
+  ctx.beginPath();
+  ctx.moveTo(15, 0);
+  ctx.lineTo(-11, -11);
+  ctx.lineTo(-7, 0);
+  ctx.lineTo(-11, 11);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#f2d5b6';
+  ctx.beginPath();
+  ctx.arc(4, 0, 6.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#12312a';
+  ctx.beginPath();
+  ctx.arc(6.5, 0, 3.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  if (player.mode === 'sneak') {
+    ctx.fillStyle = 'rgba(180, 230, 255, 0.8)';
+    ctx.font = 'bold 10px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('sneak', player.x, player.y - 20);
+  }
+}
+
+function drawGuard(ctx, guard, time) {
+  ctx.save();
+  ctx.translate(guard.x, guard.y);
+  ctx.rotate(guard.angle);
+  ctx.fillStyle = guard.state === 'chase' ? '#d94848' : COLORS.guardCoat;
+  ctx.beginPath();
+  ctx.arc(0, 0, guard.radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = COLORS.guardCoatDark;
+  ctx.beginPath();
+  ctx.moveTo(14, 0);
+  ctx.lineTo(-10, -10);
+  ctx.lineTo(-10, 10);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#f2d5b6';
+  ctx.beginPath();
+  ctx.arc(3, 0, 6, 0, Math.PI * 2);
+  ctx.fill();
+  // The lantern that names the game.
+  ctx.fillStyle = '#ffca55';
+  ctx.shadowColor = '#ffca55';
+  ctx.shadowBlur = 10;
+  ctx.beginPath();
+  ctx.arc(13, -9, 3.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Detection arc above the head: gold filling toward red.
+  if (guard.detection > 0.02) {
+    ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(guard.x, guard.y, 21, -Math.PI / 2, Math.PI * 1.5);
+    ctx.stroke();
+    ctx.strokeStyle = guard.detection > 0.75 ? '#ff5040' : guard.detection > 0.35 ? '#ff9a3c' : '#ffd94d';
+    ctx.beginPath();
+    ctx.arc(guard.x, guard.y, 21, -Math.PI / 2, -Math.PI / 2 + guard.detection * Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.font = 'bold 17px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  if (guard.state === 'chase') {
+    ctx.fillStyle = '#ff5040';
+    ctx.fillText('!', guard.x, guard.y - 27);
+  } else if (guard.state === 'suspicious' || guard.state === 'search') {
+    ctx.fillStyle = '#ffd94d';
+    ctx.fillText('?', guard.x, guard.y - 27);
+  } else if (guard.state === 'investigate') {
+    ctx.fillStyle = '#ffb35c';
+    ctx.fillText('?', guard.x, guard.y - 27);
+  }
+}
+
+function drawDarkness(ctx, game) {
+  const { width, height } = ctx.canvas;
+  lightCanvas.width = width;
+  lightCanvas.height = height - HUD_H;
+  const light = lightCanvas.getContext('2d');
+  light.clearRect(0, 0, width, lightCanvas.height);
+  light.fillStyle = 'rgba(5, 7, 16, 0.52)';
+  light.fillRect(0, 0, width, lightCanvas.height);
+  light.globalCompositeOperation = 'destination-out';
+  const cut = (x, y, radius, strength) => {
+    const gradient = light.createRadialGradient(x, y, 0, x, y, radius);
+    gradient.addColorStop(0, `rgba(0,0,0,${strength})`);
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    light.fillStyle = gradient;
+    light.beginPath();
+    light.arc(x, y, radius, 0, Math.PI * 2);
+    light.fill();
+  };
+  cut(game.player.x, game.player.y, 105, 0.85);
+  for (const guard of game.guards) cut(guard.x, guard.y, 92, 0.8);
+  for (const relic of game.level.relics) if (!relic.taken) cut(relic.x, relic.y, 40, 0.5);
+  if (game.level.relics.every((relic) => relic.taken)) cut(game.level.exit.x, game.level.exit.y, 62, 0.7);
+  ctx.drawImage(lightCanvas, 0, 0);
+}
+
+function drawHud(ctx, game) {
+  ctx.save();
+  ctx.translate(0, -HUD_H);
+  ctx.fillStyle = '#0d1120';
+  ctx.fillRect(0, 0, ctx.canvas.width, HUD_H);
+  ctx.fillStyle = '#e8e4d8';
+  ctx.font = 'bold 15px system-ui, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(game.level.name, 12, 26);
+  const taken = game.level.relics.filter((relic) => relic.taken).length;
+  ctx.font = '14px system-ui, sans-serif';
+  ctx.fillText(`◆ ${taken}/${game.level.relics.length}`, 430, 26);
+  ctx.fillText(`coins ○ ${game.player.coinsLeft}`, 520, 26);
+  const maxDetection = Math.max(0, ...game.guards.map((guard) => guard.detection));
+  ctx.fillText('eye', 640, 26);
+  ctx.fillStyle = '#2a3049';
+  ctx.fillRect(676, 14, 130, 10);
+  ctx.fillStyle = maxDetection > 0.75 ? '#ff5040' : maxDetection > 0.35 ? '#ff9a3c' : '#ffd94d';
+  ctx.fillRect(676, 14, 130 * maxDetection, 10);
+  ctx.fillStyle = '#9aa3c0';
+  ctx.font = '12px system-ui, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(game.state === 'playing' ? game.level.hint : '', 948, 26);
+  ctx.restore();
+}
+
+export function renderGame(ctx, game, time) {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.save();
+  ctx.translate(0, HUD_H);
+  drawFloor(ctx, game.level, time);
+  drawVisionCones(ctx, game.level, game.guards);
+  drawExit(ctx, game.level, time);
+  drawRelics(ctx, game.level, time);
+  drawCoins(ctx, game.player);
+  drawWallsAndCrates(ctx, game.level);
+  for (const guard of game.guards) drawGuard(ctx, guard, time);
+  drawPlayer(ctx, game.player, time);
+  drawDarkness(ctx, game);
+  ctx.restore();
+  drawHud(ctx, game);
+  if (game.state !== 'playing') drawOverlay(ctx, game);
+}
+
+function drawOverlay(ctx, game) {
+  const { width, height } = ctx.canvas;
+  ctx.fillStyle = 'rgba(5, 7, 16, 0.72)';
+  ctx.fillRect(0, 0, width, height);
+  ctx.textAlign = 'center';
+  if (game.state === 'title') {
+    ctx.fillStyle = '#ffd94d';
+    ctx.font = 'bold 54px Georgia, serif';
+    ctx.fillText('LANTERNFALL', width / 2, 210);
+    ctx.fillStyle = '#e8e4d8';
+    ctx.font = '20px system-ui, sans-serif';
+    ctx.fillText('The night museum keeps its moons under lantern light.', width / 2, 252);
+    ctx.fillText('Slip past the guards, take every moon relic, reach the exit unseen.', width / 2, 282);
+    ctx.font = '16px system-ui, sans-serif';
+    ctx.fillStyle = '#9aa3c0';
+    ctx.fillText('WASD / arrows — move      SHIFT — run (loud, fast)', width / 2, 340);
+    ctx.fillText('C — sneak (slow, faint)      CLICK — throw a coin to distract', width / 2, 368);
+    ctx.fillText('Dark rugs muffle you. Crates and walls break the lantern gaze.', width / 2, 396);
+    ctx.fillStyle = '#ffd94d';
+    ctx.font = 'bold 20px system-ui, sans-serif';
+    ctx.fillText('Press ENTER to begin', width / 2, 452);
+  } else if (game.state === 'caught') {
+    ctx.fillStyle = '#ff5040';
+    ctx.font = 'bold 44px Georgia, serif';
+    ctx.fillText('CAUGHT BY LANTERNLIGHT', width / 2, 300);
+    ctx.fillStyle = '#e8e4d8';
+    ctx.font = '18px system-ui, sans-serif';
+    ctx.fillText('Press R to try this gallery again', width / 2, 344);
+  } else if (game.state === 'levelclear') {
+    ctx.fillStyle = '#7be495';
+    ctx.font = 'bold 40px Georgia, serif';
+    ctx.fillText('GALLERY CLEARED — UNSEEN', width / 2, 300);
+    ctx.fillStyle = '#e8e4d8';
+    ctx.font = '18px system-ui, sans-serif';
+    ctx.fillText('Press ENTER for the next gallery', width / 2, 344);
+  } else if (game.state === 'win') {
+    ctx.fillStyle = '#ffd94d';
+    ctx.font = 'bold 46px Georgia, serif';
+    ctx.fillText('ALL MOONS STOLEN', width / 2, 290);
+    ctx.fillStyle = '#e8e4d8';
+    ctx.font = '19px system-ui, sans-serif';
+    ctx.fillText(`The museum wakes none the wiser. Time: ${game.elapsed.toFixed(1)}s · Times spotted: ${game.timesSpotted}`, width / 2, 334);
+    ctx.fillText('Press R to play again', width / 2, 372);
+  }
+}
