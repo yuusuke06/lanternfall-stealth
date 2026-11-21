@@ -62,6 +62,11 @@ export const sound = {
     tone({ frequency: 1560, duration: 0.07, type: 'triangle', volume: 0.16 });
     tone({ frequency: 2090, duration: 0.12, type: 'triangle', volume: 0.12, delay: 0.05 });
   },
+  moonChime() {
+    // Moonlight ringing like glass: two high, quiet partials.
+    tone({ frequency: 2349, duration: 0.35, type: 'sine', volume: 0.045 });
+    tone({ frequency: 3136, duration: 0.22, type: 'sine', volume: 0.03, delay: 0.02 });
+  },
   relic() {
     tone({ frequency: 880, duration: 0.10, type: 'sine', volume: 0.14 });
     tone({ frequency: 1320, duration: 0.16, type: 'sine', volume: 0.12, delay: 0.07 });

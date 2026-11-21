@@ -2,8 +2,14 @@
 // Legend: # wall, C crate (solid cover), . open floor, , shadow rug
 // (detection is slower while you stand on it), M moonlit floor under a
 // high window (detection is faster — the moon betrays you there),
-// P player start, E exit door, R moon relic. Guards patrol the
+// P player start, E exit door, R moon relic, * the First Moon (the
+// grand relic). Guards patrol the
 // waypoint loops listed under each map; waypoints are tile coords.
+
+// The grand relic: the Mother Moon, kept in the final gallery. It is
+// one relic among the gallery's count, but larger, brighter, and the
+// story's whole point — Lune came for this one above all.
+export const GRAND_RELIC_NAME = 'the Mother Moon';
 
 export const LEVELS = [
   {
@@ -93,6 +99,37 @@ export const LEVELS = [
       { waypoints: [[19, 6], [21, 6], [21, 9], [19, 9]] },
     ],
   },
+  {
+    name: 'Gallery IV — The Mother Moon',
+    hint: 'Six lanterns, and the Mother Moon watching over her children.',
+    coins: 4,
+    map: [
+      '########################',
+      '#P...#......#......#...#',
+      '#....#..R...#..CC..#...#',
+      '#.C..#......#......#.R.#',
+      '#....###.####..C...#...#',
+      '#.........M............#',
+      '#..CC...,,,,,...###.####',
+      '#.......,,,,,..........#',
+      '#..R....,,,,,....C.....#',
+      '#.......,,,,,..........#',
+      '#....###.####......R...#',
+      '#......................#',
+      '#.C..#......#..CC..#...#',
+      '#....#..*...#......#..E#',
+      '#....#......#..R...#...#',
+      '########################',
+    ],
+    guards: [
+      { waypoints: [[7, 1], [11, 1], [11, 3], [7, 3]] },
+      { waypoints: [[18, 5], [21, 5], [21, 8], [18, 8]] },
+      { waypoints: [[2, 5], [5, 5], [5, 8], [2, 8]] },
+      { waypoints: [[9, 11], [14, 11], [14, 13], [9, 13]] },
+      { waypoints: [[20, 11], [20, 14], [17, 14], [17, 11]] },
+      { waypoints: [[12, 5], [12, 8], [15, 8], [15, 5]] },
+    ],
+  },
 ];
 
 // Parse one level map into the world model the other modules use:
@@ -112,7 +149,8 @@ export function parseLevel(definition) {
       if (ch === 'M') moonlit.add(key(col, row));
       if (ch === 'P') playerStart = { x: col * 40 + 20, y: row * 40 + 20 };
       if (ch === 'E') exit = { x: col * 40 + 20, y: row * 40 + 20, col, row };
-      if (ch === 'R') relics.push({ x: col * 40 + 20, y: row * 40 + 20, taken: false, phase: col * 1.7 + row });
+      if (ch === 'R') relics.push({ x: col * 40 + 20, y: row * 40 + 20, taken: false, grand: false, phase: col * 1.7 + row });
+      if (ch === '*') relics.push({ x: col * 40 + 20, y: row * 40 + 20, taken: false, grand: true, phase: col * 1.7 + row });
     });
   });
   return {

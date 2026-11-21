@@ -9,9 +9,10 @@ An original top-down stealth game for the make.fun
 
 The night museum keeps its moon relics under lantern light. You are
 Lune, a small girl with a little lantern who has slipped in after
-closing: slip past the lantern guards, take every moon relic in three
+closing: slip past the lantern guards, take every moon relic in four
 galleries, and reach the exit unseen — a quiet, slightly eerie night
-walk through dark halls.
+walk through dark halls. In the last gallery waits the Mother Moon,
+the grand relic she came for above all.
 
 ## How to play
 
@@ -23,8 +24,13 @@ walk through dark halls.
   guard's suspicion arc; hide and it drains. Full certainty means a chase —
   break line of sight and he loses you at the last place he saw.
 - Dark rugs muffle you: detection fills far more slowly while you cross them.
-- Moonlight pools under the high windows betray you: detection fills far
-  faster while you stand in one. The prettiest floor is the most dangerous.
+- Moonlight pools under the high windows betray you twice over:
+  detection fills far faster while you stand in one, and the light rings
+  like glass underfoot — walking or running across it chimes, and nearby
+  guards come to look. Only sneaking crosses in silence. The prettiest
+  floor is the most dangerous.
+- Clear a gallery without ever being chased and it is marked PHANTOM,
+  with your time — vanish unseen, like the rumour she is.
 - The exit door stays locked red until every relic in the gallery is taken,
   then it burns green.
 

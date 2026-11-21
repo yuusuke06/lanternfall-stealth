@@ -16,6 +16,7 @@ export const PLAYER_WALK_SPEED = 138;
 export const PLAYER_RUN_SPEED = 218;
 export const PLAYER_SNEAK_SPEED = 74;
 export const RUN_NOISE_RADIUS = 96;
+export const MOONLIGHT_CHIME_RADIUS = 74;
 
 export const GUARD_RADIUS = 14;
 export const GUARD_PATROL_SPEED = 62;

@@ -4,9 +4,10 @@
 
 import {
   PLAYER_RADIUS, PLAYER_WALK_SPEED, PLAYER_RUN_SPEED, PLAYER_SNEAK_SPEED,
-  RUN_NOISE_RADIUS, COINS_PER_LEVEL,
+  RUN_NOISE_RADIUS, MOONLIGHT_CHIME_RADIUS, COINS_PER_LEVEL,
 } from './config.js';
 import { collideWithSolids } from './vision.js';
+import { isMoonlitAt } from './levels.js';
 import { sound } from './audio.js';
 
 export function createPlayer(level) {
@@ -39,6 +40,13 @@ export function updatePlayer(player, level, input, dt, events) {
       player.stepTimer = player.mode === 'run' ? 0.24 : player.mode === 'sneak' ? 0.5 : 0.34;
       if (player.mode !== 'sneak') sound.playerStep(player.mode === 'run');
       if (player.mode === 'run') events.push({ type: 'noise', x: player.x, y: player.y, radius: RUN_NOISE_RADIUS });
+      // Moonlight rings like glass underfoot: crossing a moonlit pool
+      // while walking or running chimes faintly, and nearby guards
+      // hear it. Only sneaking crosses in silence.
+      if (player.mode !== 'sneak' && isMoonlitAt(level, player.x, player.y)) {
+        events.push({ type: 'noise', x: player.x, y: player.y, radius: MOONLIGHT_CHIME_RADIUS });
+        events.push({ type: 'chime', x: player.x, y: player.y });
+      }
     }
   }
 

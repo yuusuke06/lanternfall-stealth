@@ -44,13 +44,15 @@ export function setupShot(game, name) {
     game.player.coins.push({ x: 150, y: 140, ring: 0.55 });
     game.player.coinsLeft = 3;
   } else if (name === 'exit') {
-    // The vault emptied: every moon taken, the exit burning green.
+    // Gallery IV emptied — even the Mother Moon is hers: the exit
+    // burns green and six lanterns sweep empty halls behind her.
     for (const relic of game.level.relics) relic.taken = true;
-    place(guards[0], 260, 220, Math.PI / 2);
-    place(guards[1], 700, 90, Math.PI);
-    place(guards[2], 140, 460, 0);
-    place(guards[3], 500, 540, -Math.PI / 2);
-    place(guards[4], 820, 260, Math.PI / 2);
+    place(guards[0], 300, 60, Math.PI / 2);
+    place(guards[1], 740, 220, Math.PI / 2);
+    place(guards[2], 100, 220, 0);
+    place(guards[3], 460, 500, -Math.PI / 2);
+    place(guards[4], 820, 500, Math.PI);
+    place(guards[5], 500, 260, 0);
     game.player.x = 868; game.player.y = 545; game.player.angle = 0.5;
   }
 }

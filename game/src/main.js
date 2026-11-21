@@ -27,6 +27,8 @@ const game = {
   player: null,
   guards: [],
   elapsed: 0,
+  levelTime: 0,
+  seenThisLevel: false,
   timesSpotted: 0,
   shotMode: new URLSearchParams(window.location.search).get('shot'),
   shotLevel: Number(new URLSearchParams(window.location.search).get('level') ?? 0),
@@ -37,6 +39,8 @@ function loadLevel(index) {
   game.level = parseLevel(LEVELS[index]);
   game.player = createPlayer(game.level);
   game.guards = game.level.guardDefs.map((definition) => createGuard(definition));
+  game.levelTime = 0;
+  game.seenThisLevel = false;
   game.state = 'playing';
   status.textContent = game.level.name;
 }
@@ -48,8 +52,12 @@ let exitAnnounced = false;
 function step(dt) {
   if (game.state !== 'playing') return;
   game.elapsed += dt;
+  game.levelTime += dt;
   const events = [];
   updatePlayer(game.player, game.level, input, dt, events);
+  if (events.some((event) => event.type === 'chime')) sound.moonChime();
+  // The phantom record: was she ever truly seen this gallery?
+  if (game.guards.some((guard) => guard.state === 'chase')) game.seenThisLevel = true;
   const pickedBefore = game.level.relics.filter((relic) => relic.taken).length;
   collectRelics(game.player, game.level, () => {
     if (!exitAnnounced) {

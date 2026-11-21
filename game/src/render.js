@@ -105,9 +105,25 @@ function drawExit(ctx, level, time) {
 function drawRelics(ctx, level, time) {
   for (const relic of level.relics) {
     if (relic.taken) continue;
+    // The Mother Moon is drawn grand: half again as large, haloed,
+    // with a slow crown of orbiting sparks — the one she came for.
+    const scale = relic.grand ? 1.55 : 1;
     const bob = Math.sin(time * 2.4 + relic.phase) * 3;
     ctx.save();
     ctx.translate(relic.x, relic.y + bob);
+    if (relic.grand) {
+      const halo = ctx.createRadialGradient(0, 0, 2, 0, 0, 30);
+      halo.addColorStop(0, 'rgba(255, 217, 77, 0.35)');
+      halo.addColorStop(1, 'rgba(255, 217, 77, 0)');
+      ctx.fillStyle = halo;
+      ctx.fillRect(-30, -30, 60, 60);
+      ctx.fillStyle = 'rgba(255, 243, 176, 0.9)';
+      for (let i = 0; i < 3; i++) {
+        const orbit = time * 0.9 + (i * Math.PI * 2) / 3;
+        ctx.fillRect(Math.cos(orbit) * 17 - 1, Math.sin(orbit) * 17 - 1, 2, 2);
+      }
+    }
+    ctx.scale(scale, scale);
     ctx.shadowColor = COLORS.relic;
     ctx.shadowBlur = 14;
     ctx.fillStyle = COLORS.relic;
@@ -392,12 +408,15 @@ function drawOverlay(ctx, game) {
     ctx.font = '18px system-ui, sans-serif';
     ctx.fillText('Press R to try this gallery again', width / 2, 344);
   } else if (game.state === 'levelclear') {
+    const seconds = Math.floor(game.levelTime);
+    const clock = Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
     ctx.fillStyle = '#7be495';
     ctx.font = 'bold 40px Georgia, serif';
-    ctx.fillText('GALLERY CLEARED — UNSEEN', width / 2, 300);
+    ctx.fillText(game.seenThisLevel ? 'GALLERY CLEARED' : 'GALLERY CLEARED — PHANTOM', width / 2, 292);
     ctx.fillStyle = '#e8e4d8';
     ctx.font = '18px system-ui, sans-serif';
-    ctx.fillText('Press ENTER for the next gallery', width / 2, 344);
+    ctx.fillText((game.seenThisLevel ? 'Seen, but gone like mist.' : 'Never seen. A rumour with a lantern.') + '  Time ' + clock, width / 2, 330);
+    ctx.fillText('Press ENTER for the next gallery', width / 2, 362);
   } else if (game.state === 'win') {
     ctx.fillStyle = '#ffd94d';
     ctx.font = 'bold 46px Georgia, serif';
