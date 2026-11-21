@@ -7,9 +7,11 @@
 An original top-down stealth game for the make.fun
 [best stealth game bounty](https://make.fun/c/best-stealth-game-20261121-1759).
 
-The night museum keeps its moon relics under lantern light. You are the
-thief in the teal cloak: slip past the lantern guards, take every moon
-relic in three galleries, and reach the exit unseen.
+The night museum keeps its moon relics under lantern light. You are
+Lune, a small girl with a little lantern who has slipped in after
+closing: slip past the lantern guards, take every moon relic in three
+galleries, and reach the exit unseen — a quiet, slightly eerie night
+walk through dark halls.
 
 ## How to play
 

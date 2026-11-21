@@ -171,22 +171,37 @@ function drawPlayer(ctx, player, time) {
     ctx.stroke();
   }
   ctx.rotate(player.angle);
-  ctx.fillStyle = player.mode === 'sneak' ? COLORS.playerCloakDark : COLORS.playerCloak;
+  ctx.scale(1.35, player.mode === 'sneak' ? 1.16 : 1.35);
+  // Lune: a small girl in a flared indigo dress, bobbed dark hair, and
+  // the little lantern she carries — the museum's one friendly light.
+  ctx.fillStyle = player.mode === 'sneak' ? '#3a4a85' : '#46589e';
   ctx.beginPath();
-  ctx.moveTo(15, 0);
-  ctx.lineTo(-11, -11);
-  ctx.lineTo(-7, 0);
-  ctx.lineTo(-11, 11);
+  ctx.moveTo(3, -4);
+  ctx.lineTo(8, -2);
+  ctx.lineTo(11, 10);
+  ctx.lineTo(-9, 11);
+  ctx.lineTo(-11, -3);
   ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = '#f2d5b6';
+  ctx.fillStyle = '#8fa3e8';
+  ctx.fillRect(-9.5, 9.2, 20, 1.8);
+  ctx.fillStyle = '#f2d7c4';
   ctx.beginPath();
-  ctx.arc(4, 0, 6.5, 0, Math.PI * 2);
+  ctx.arc(2, -3, 6.6, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = '#12312a';
+  ctx.fillStyle = '#2c2430';
   ctx.beginPath();
-  ctx.arc(6.5, 0, 3.4, 0, Math.PI * 2);
+  ctx.arc(1.2, -4.4, 6.8, Math.PI * 0.9, Math.PI * 2.1);
   ctx.fill();
+  ctx.fillRect(-5.8, -6, 3.2, 10);
+  const flicker = 0.75 + Math.sin(time * 11) * 0.12;
+  const glow = ctx.createRadialGradient(14, 3, 1, 14, 3, 13);
+  glow.addColorStop(0, `rgba(255, 214, 130, ${0.5 * flicker})`);
+  glow.addColorStop(1, 'rgba(255, 214, 130, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(1, -10, 26, 26);
+  ctx.fillStyle = '#ffd682';
+  ctx.fillRect(12.4, 1.2, 3.4, 4.2);
   ctx.restore();
   if (player.mode === 'sneak') {
     ctx.fillStyle = 'rgba(180, 230, 255, 0.8)';
@@ -359,8 +374,8 @@ function drawOverlay(ctx, game) {
     ctx.fillText('LANTERNFALL', width / 2, 210);
     ctx.fillStyle = '#e8e4d8';
     ctx.font = '20px system-ui, sans-serif';
-    ctx.fillText('The night museum keeps its moons under lantern light.', width / 2, 252);
-    ctx.fillText('Slip past the guards, take every moon relic, reach the exit unseen.', width / 2, 282);
+    ctx.fillText('Lune, a girl with a little lantern, has slipped into the sleeping museum.', width / 2, 252);
+    ctx.fillText('It keeps its moons under lantern light. She has come to take them back, unseen.', width / 2, 282);
     ctx.font = '16px system-ui, sans-serif';
     ctx.fillStyle = '#9aa3c0';
     ctx.fillText('WASD / arrows — move      SHIFT — run (loud, fast)', width / 2, 340);
