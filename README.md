@@ -21,8 +21,18 @@ relic in three galleries, and reach the exit unseen.
   guard's suspicion arc; hide and it drains. Full certainty means a chase —
   break line of sight and he loses you at the last place he saw.
 - Dark rugs muffle you: detection fills far more slowly while you cross them.
+- Moonlight pools under the high windows betray you: detection fills far
+  faster while you stand in one. The prettiest floor is the most dangerous.
 - The exit door stays locked red until every relic in the gallery is taken,
   then it burns green.
+
+## Music
+
+An original generative score, synthesised live with WebAudio — a felt
+piano and a music box over a slow Dm9 – B♭maj7 – Fmaj9 – A7sus cycle,
+written as a moonlit miniature. When a guard's suspicion rises, a quiet
+tension voice joins the score and fades again when the danger passes.
+See `game/src/music.js`.
 
 ## Running it
 
@@ -39,6 +49,7 @@ network requests. Serve that folder with any static server, or run
 - `game/src/player.js` — the thief: gaits, noise, coins, relics
 - `game/src/render.js` — floor, cover, cones, lantern lighting, HUD
 - `game/src/audio.js` — synthesised footsteps, coins and alarms (WebAudio)
+- `game/src/music.js` — the generative moonlit score and its tension voice
 - `game/src/input.js` — keyboard and mouse
 - `game/src/shots.js` — posed scenes used for the screenshots
 

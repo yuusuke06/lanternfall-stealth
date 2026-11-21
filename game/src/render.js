@@ -30,6 +30,19 @@ function drawFloor(ctx, level, time) {
         ctx.lineWidth = 2;
         ctx.strokeRect(x + 5, y + 5, TILE - 10, TILE - 10);
       }
+      if (ch === 'M') {
+        // A pool of moonlight from a high window: beautiful, and the
+        // most dangerous floor in the museum to be caught standing on.
+        const glow = ctx.createRadialGradient(x + TILE / 2, y + TILE / 2, 2, x + TILE / 2, y + TILE / 2, TILE * 0.85);
+        glow.addColorStop(0, 'rgba(168, 199, 255, 0.34)');
+        glow.addColorStop(1, 'rgba(168, 199, 255, 0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(x - TILE / 2, y - TILE / 2, TILE * 2, TILE * 2);
+        ctx.fillStyle = 'rgba(220, 234, 255, 0.5)';
+        ctx.fillRect(x + 9, y + 7, 2, 2);
+        ctx.fillRect(x + 27, y + 24, 2, 2);
+        ctx.fillRect(x + 17, y + 31, 1.6, 1.6);
+      }
     }
   }
 }
@@ -237,6 +250,31 @@ function drawGuard(ctx, guard, time) {
   }
 }
 
+// Dust motes drifting in the lantern light: slow, deterministic, and
+// purely for the room's held breath.
+function drawDustMotes(ctx, time) {
+  ctx.fillStyle = 'rgba(230, 238, 255, 0.35)';
+  for (let i = 0; i < 42; i++) {
+    const seedX = (i * 197.3) % 960;
+    const seedY = (i * 89.7) % 640;
+    const x = seedX + Math.sin(time * 0.24 + i * 1.7) * 14;
+    const y = (seedY + time * (4 + (i % 5))) % 640;
+    const size = 1 + (i % 3) * 0.5;
+    ctx.globalAlpha = 0.12 + (i % 4) * 0.06;
+    ctx.fillRect(x, y, size, size);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawVignette(ctx) {
+  const { width } = ctx.canvas;
+  const gradient = ctx.createRadialGradient(width / 2, 320, 300, width / 2, 320, 720);
+  gradient.addColorStop(0, 'rgba(3, 4, 10, 0)');
+  gradient.addColorStop(1, 'rgba(3, 4, 10, 0.42)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, 640);
+}
+
 function drawDarkness(ctx, game) {
   const { width, height } = ctx.canvas;
   lightCanvas.width = width;
@@ -303,6 +341,8 @@ export function renderGame(ctx, game, time) {
   drawVisionCones(ctx, game.level, game.guards);
   for (const guard of game.guards) drawGuard(ctx, guard, time);
   drawPlayer(ctx, game.player, time);
+  drawDustMotes(ctx, time);
+  drawVignette(ctx);
   ctx.restore();
   drawHud(ctx, game);
   if (game.state !== 'playing') drawOverlay(ctx, game);

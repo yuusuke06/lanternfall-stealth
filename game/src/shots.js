@@ -1,42 +1,56 @@
 // Deterministic scenes for the maker's screenshots, chosen with
-// ?shot=<name>. Each scene poses the real game state — same level, same
-// guards, same cones — at a moment that shows one part of the game:
-// cover behind a crate, sneaking across a shadow rug, a guard alarmed
-// while a coin pulls another away, and the unlocked exit.
+// ?shot=<name>&level=<n>. Each scene poses the real game state — same
+// levels, same guards, same cones — at a moment that shows one part of
+// the game, and together they tour all three galleries: cover behind a
+// crate in Gallery I, sneaking across a shadow rug in Gallery II, a
+// chase breaking out in the Lantern Vault while a coin pulls another
+// guard away, and the unlocked exit at the vault's end.
 
 export function setupShot(game, name) {
-  const [first, second, third] = game.guards;
+  const guards = game.guards;
+  const place = (guard, x, y, angle, extra = {}) => {
+    if (!guard) return;
+    guard.x = x;
+    guard.y = y;
+    guard.angle = angle;
+    Object.assign(guard, extra);
+  };
+
   if (name === 'cover') {
-    // Guard's cone breaks on a crate; the thief waits in its shadow.
-    first.x = 372; first.y = 190; first.angle = 0; first.detection = 0.12;
+    // Gallery I: a guard's cone breaks on a crate; the thief waits in
+    // the shadow the crate makes, a moonlit pool glowing beside him.
+    place(guards[0], 372, 190, 0, { detection: 0.12 });
+    place(guards[1], 760, 110, Math.PI);
+    place(guards[2], 520, 540, -Math.PI / 2);
     game.player.x = 508; game.player.y = 192; game.player.angle = 0.4;
-    second.x = 760; second.y = 110; second.angle = Math.PI;
-    if (third) { third.x = 520; third.y = 540; third.angle = -Math.PI / 2; }
   } else if (name === 'sneak') {
-    // Crossing the rug inside the edge of a cone, meter half full.
-    game.player.x = 428; game.player.y = 348; game.player.angle = Math.PI / 2;
+    // Gallery II: crossing the shadow rug inside the edge of a cone,
+    // the guard's suspicion arc half full — one held breath from safe.
+    place(guards[0], 390, 215, Math.PI / 2, { detection: 0.48, state: 'suspicious' });
+    place(guards[1], 700, 110, Math.PI);
+    place(guards[2], 340, 500, 0);
+    place(guards[3], 850, 340, -Math.PI / 2);
+    game.player.x = 428; game.player.y = 330; game.player.angle = Math.PI / 2;
     game.player.mode = 'sneak';
-    first.x = 428; first.y = 238; first.angle = Math.PI / 2; first.detection = 0.48;
-    first.state = 'suspicious';
-    second.x = 830; second.y = 250; second.angle = Math.PI;
-    if (third) { third.x = 300; third.y = 540; third.angle = 0; }
   } else if (name === 'alert') {
-    // One guard has the scent and charges; a thrown coin pulls another.
-    game.player.x = 716; game.player.y = 556; game.player.angle = 0.2;
-    game.player.coins.push({ x: 268, y: 128, ring: 0.55 });
-    game.player.coinsLeft = 2;
-    if (third) {
-      third.x = 636; third.y = 552; third.angle = 0; third.detection = 1;
-      third.state = 'chase';
-    }
-    first.x = 330; first.y = 128; first.angle = Math.PI; first.state = 'investigate';
-    second.x = 800; second.y = 90; second.angle = Math.PI / 2; second.detection = 0.3;
+    // Gallery III, the Lantern Vault: one guard has the scent and
+    // charges; a thrown coin's ring pulls another off his patrol.
+    place(guards[0], 425, 295, 0, { detection: 1, state: 'chase' });
+    place(guards[1], 700, 90, Math.PI);
+    place(guards[2], 215, 140, Math.PI, { state: 'investigate' });
+    place(guards[3], 500, 520, -Math.PI / 2);
+    place(guards[4], 820, 300, Math.PI / 2, { detection: 0.3 });
+    game.player.x = 500; game.player.y = 300; game.player.angle = 0.2;
+    game.player.coins.push({ x: 150, y: 140, ring: 0.55 });
+    game.player.coinsLeft = 3;
   } else if (name === 'exit') {
-    // Every relic taken: the exit burns green and the way is clear.
+    // The vault emptied: every moon taken, the exit burning green.
     for (const relic of game.level.relics) relic.taken = true;
-    game.player.x = 872; game.player.y = 548; game.player.angle = 0.5;
-    first.x = 220; first.y = 260; first.angle = Math.PI / 2;
-    second.x = 700; second.y = 130; second.angle = Math.PI;
-    if (third) { third.x = 480; third.y = 540; third.angle = -Math.PI / 2; }
+    place(guards[0], 260, 220, Math.PI / 2);
+    place(guards[1], 700, 90, Math.PI);
+    place(guards[2], 140, 460, 0);
+    place(guards[3], 500, 540, -Math.PI / 2);
+    place(guards[4], 820, 260, Math.PI / 2);
+    game.player.x = 868; game.player.y = 545; game.player.angle = 0.5;
   }
 }

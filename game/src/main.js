@@ -11,6 +11,7 @@ import { createInput } from './input.js';
 import { renderGame } from './render.js';
 import { setupShot } from './shots.js';
 import { sound } from './audio.js';
+import { music } from './music.js';
 
 const canvas = document.getElementById('game');
 canvas.width = CANVAS_W;
@@ -28,6 +29,7 @@ const game = {
   elapsed: 0,
   timesSpotted: 0,
   shotMode: new URLSearchParams(window.location.search).get('shot'),
+  shotLevel: Number(new URLSearchParams(window.location.search).get('level') ?? 0),
 };
 
 function loadLevel(index) {
@@ -60,6 +62,7 @@ function step(dt) {
     announce(`Relic taken: ${game.level.relics.filter((relic) => relic.taken).length} of ${game.level.relics.length}`);
   }
   const alarms = [];
+  music.setTension(Math.max(0, ...game.guards.map((guard) => guard.detection)));
   for (const guard of game.guards) {
     if (updateGuard(guard, game.level, game.player, dt, events, alarms) === 'caught') {
       game.state = 'caught';
@@ -84,6 +87,7 @@ function step(dt) {
 function handleStateKeys() {
   if (game.state === 'title' && input.pressed('enter')) {
     sound.unlock();
+    music.start();
     game.elapsed = 0;
     game.timesSpotted = 0;
     exitAnnounced = false;
@@ -103,7 +107,7 @@ function handleStateKeys() {
 }
 
 // Boot: a posed scene for screenshots, or the title over gallery one.
-loadLevel(0);
+loadLevel(game.shotMode ? game.shotLevel : 0);
 if (game.shotMode) {
   setupShot(game, game.shotMode);
   game.state = 'playing';

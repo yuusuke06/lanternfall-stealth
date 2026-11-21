@@ -1,1 +1,1 @@
-[{"name":"1-cover.jpg","query":"?shot=cover"},{"name":"2-sneak.jpg","query":"?shot=sneak"},{"name":"3-alert.jpg","query":"?shot=alert"},{"name":"4-exit.jpg","query":"?shot=exit"}]
+[{"name":"1-cover.jpg","query":"?shot=cover&level=0"},{"name":"2-sneak.jpg","query":"?shot=sneak&level=1"},{"name":"3-alert.jpg","query":"?shot=alert&level=2"},{"name":"4-exit.jpg","query":"?shot=exit&level=2"}]

@@ -8,11 +8,11 @@ import {
   GUARD_RADIUS, GUARD_PATROL_SPEED, GUARD_INVESTIGATE_SPEED, GUARD_CHASE_SPEED,
   GUARD_TURN_SPEED, GUARD_WAYPOINT_PAUSE, VISION_HALF_ANGLE, CATCH_DISTANCE,
   DETECTION_FILL_SECONDS, DETECTION_DECAY_PER_SECOND, SUSPICIOUS_THRESHOLD,
-  SHADOW_DETECTION_FACTOR, SNEAK_DETECTION_FACTOR, RUN_DETECTION_FACTOR,
+  SHADOW_DETECTION_FACTOR, MOONLIGHT_DETECTION_FACTOR, SNEAK_DETECTION_FACTOR, RUN_DETECTION_FACTOR,
   COIN_DISTRACT_RADIUS,
 } from './config.js';
 import { canSee, collideWithSolids } from './vision.js';
-import { isShadowAt } from './levels.js';
+import { isShadowAt, isMoonlitAt } from './levels.js';
 import { sound } from './audio.js';
 
 let guardCounter = 0;
@@ -84,6 +84,7 @@ function sensePlayer(guard, level, player, dt, alarms) {
   if (seen) {
     let factor = 1 - (distance / 190) * 0.55;
     if (isShadowAt(level, player.x, player.y)) factor *= SHADOW_DETECTION_FACTOR;
+    if (isMoonlitAt(level, player.x, player.y)) factor *= MOONLIGHT_DETECTION_FACTOR;
     if (player.mode === 'sneak') factor *= SNEAK_DETECTION_FACTOR;
     if (player.mode === 'run') factor *= RUN_DETECTION_FACTOR;
     guard.detection = Math.min(1, guard.detection + (dt / DETECTION_FILL_SECONDS) * factor);

@@ -1,8 +1,9 @@
 // The three galleries of the night museum, drawn as tile maps.
 // Legend: # wall, C crate (solid cover), . open floor, , shadow rug
-// (detection is slower while you stand on it), P player start,
-// E exit door, R moon relic. Guards patrol the waypoint loops listed
-// under each map; waypoints are tile coordinates.
+// (detection is slower while you stand on it), M moonlit floor under a
+// high window (detection is faster — the moon betrays you there),
+// P player start, E exit door, R moon relic. Guards patrol the
+// waypoint loops listed under each map; waypoints are tile coords.
 
 export const LEVELS = [
   {
@@ -11,12 +12,12 @@ export const LEVELS = [
     coins: 3,
     map: [
       '########################',
-      '#P.....#.......#.......#',
+      '#P..M..#.......#...M...#',
       '#..R...#...C...#...C...#',
       '#......#.......#.......#',
       '#..CC......C.......R...#',
       '#......#####.#####.....#',
-      '#......................#',
+      '#......M.......M.......#',
       '#...C....,,,,....C.....#',
       '#........,,,,..........#',
       '#..R.....,,,,.....CC...#',
@@ -43,7 +44,7 @@ export const LEVELS = [
       '#..C..#..R.....#..CC...#',
       '#.....#........#.......#',
       '#.....#####.####...R...#',
-      '#......................#',
+      '#...M..........M.......#',
       '#..CC....,,,,....#####.#',
       '#........,,,,..........#',
       '#..R.....,,,,....C.....#',
@@ -72,7 +73,7 @@ export const LEVELS = [
       '#....#..R...#..C...#...#',
       '#.C..#......#......#...#',
       '#....#####.#####.###...#',
-      '#......................#',
+      '#.....M.......M........#',
       '#..C....,,,,,.....C....#',
       '#.......,,,,,..........#',
       '#..R....,,,,,....C..R..#',
@@ -99,6 +100,7 @@ export const LEVELS = [
 export function parseLevel(definition) {
   const solid = new Set();
   const shadow = new Set();
+  const moonlit = new Set();
   let playerStart = { x: 60, y: 60 };
   let exit = { x: 0, y: 0 };
   const relics = [];
@@ -107,6 +109,7 @@ export function parseLevel(definition) {
     [...line].forEach((ch, col) => {
       if (ch === '#' || ch === 'C') solid.add(key(col, row));
       if (ch === ',') shadow.add(key(col, row));
+      if (ch === 'M') moonlit.add(key(col, row));
       if (ch === 'P') playerStart = { x: col * 40 + 20, y: row * 40 + 20 };
       if (ch === 'E') exit = { x: col * 40 + 20, y: row * 40 + 20, col, row };
       if (ch === 'R') relics.push({ x: col * 40 + 20, y: row * 40 + 20, taken: false, phase: col * 1.7 + row });
@@ -119,6 +122,7 @@ export function parseLevel(definition) {
     map: definition.map,
     solid,
     shadow,
+    moonlit,
     playerStart,
     exit,
     relics,
@@ -138,4 +142,9 @@ export function tileAt(level, x, y) {
 export function isShadowAt(level, x, y) {
   const { col, row } = tileAt(level, x, y);
   return level.shadow.has(col + ',' + row);
+}
+
+export function isMoonlitAt(level, x, y) {
+  const { col, row } = tileAt(level, x, y);
+  return level.moonlit.has(col + ',' + row);
 }

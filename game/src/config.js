@@ -32,6 +32,7 @@ export const DETECTION_FILL_SECONDS = 0.85; // point blank, standing in the open
 export const DETECTION_DECAY_PER_SECOND = 0.32;
 export const SUSPICIOUS_THRESHOLD = 0.35;
 export const SHADOW_DETECTION_FACTOR = 0.42;
+export const MOONLIGHT_DETECTION_FACTOR = 1.55;
 export const SNEAK_DETECTION_FACTOR = 0.55;
 export const RUN_DETECTION_FACTOR = 1.35;
 
