@@ -9,10 +9,10 @@ import { buildVisionCone } from './vision.js';
 const lightCanvas = document.createElement('canvas');
 
 function coneColor(detection, state) {
-  if (state === 'chase') return 'rgba(255, 70, 50, 0.30)';
-  if (detection > 0.6) return 'rgba(255, 130, 40, 0.28)';
-  if (detection > 0.3) return 'rgba(255, 180, 60, 0.24)';
-  return COLORS.coneCalm;
+  if (state === 'chase') return 'rgba(255, 70, 50, 0.42)';
+  if (detection > 0.6) return 'rgba(255, 130, 40, 0.40)';
+  if (detection > 0.3) return 'rgba(255, 180, 60, 0.36)';
+  return 'rgba(255, 214, 90, 0.32)';
 }
 
 function drawFloor(ctx, level, time) {
@@ -243,7 +243,7 @@ function drawDarkness(ctx, game) {
   lightCanvas.height = height - HUD_H;
   const light = lightCanvas.getContext('2d');
   light.clearRect(0, 0, width, lightCanvas.height);
-  light.fillStyle = 'rgba(5, 7, 16, 0.52)';
+  light.fillStyle = 'rgba(5, 7, 16, 0.34)';
   light.fillRect(0, 0, width, lightCanvas.height);
   light.globalCompositeOperation = 'destination-out';
   const cut = (x, y, radius, strength) => {
@@ -264,7 +264,6 @@ function drawDarkness(ctx, game) {
 
 function drawHud(ctx, game) {
   ctx.save();
-  ctx.translate(0, -HUD_H);
   ctx.fillStyle = '#0d1120';
   ctx.fillRect(0, 0, ctx.canvas.width, HUD_H);
   ctx.fillStyle = '#e8e4d8';
@@ -273,18 +272,19 @@ function drawHud(ctx, game) {
   ctx.fillText(game.level.name, 12, 26);
   const taken = game.level.relics.filter((relic) => relic.taken).length;
   ctx.font = '14px system-ui, sans-serif';
-  ctx.fillText(`◆ ${taken}/${game.level.relics.length}`, 430, 26);
-  ctx.fillText(`coins ○ ${game.player.coinsLeft}`, 520, 26);
+  ctx.fillText(`◆ relics ${taken}/${game.level.relics.length}`, 452, 26);
+  ctx.fillText(`○ coins ${game.player.coinsLeft}`, 580, 26);
   const maxDetection = Math.max(0, ...game.guards.map((guard) => guard.detection));
-  ctx.fillText('eye', 640, 26);
+  ctx.fillText('eye', 684, 26);
   ctx.fillStyle = '#2a3049';
-  ctx.fillRect(676, 14, 130, 10);
+  ctx.fillRect(716, 14, 110, 10);
   ctx.fillStyle = maxDetection > 0.75 ? '#ff5040' : maxDetection > 0.35 ? '#ff9a3c' : '#ffd94d';
-  ctx.fillRect(676, 14, 130 * maxDetection, 10);
-  ctx.fillStyle = '#9aa3c0';
-  ctx.font = '12px system-ui, sans-serif';
+  ctx.fillRect(716, 14, 110 * maxDetection, 10);
+  const exitOpen = taken === game.level.relics.length;
+  ctx.fillStyle = exitOpen ? '#7be495' : '#9aa3c0';
+  ctx.font = 'bold 12px system-ui, sans-serif';
   ctx.textAlign = 'right';
-  ctx.fillText(game.state === 'playing' ? game.level.hint : '', 948, 26);
+  ctx.fillText(exitOpen ? 'EXIT OPEN' : 'EXIT LOCKED', 948, 26);
   ctx.restore();
 }
 
@@ -293,14 +293,16 @@ export function renderGame(ctx, game, time) {
   ctx.save();
   ctx.translate(0, HUD_H);
   drawFloor(ctx, game.level, time);
-  drawVisionCones(ctx, game.level, game.guards);
   drawExit(ctx, game.level, time);
   drawRelics(ctx, game.level, time);
   drawCoins(ctx, game.player);
   drawWallsAndCrates(ctx, game.level);
+  drawDarkness(ctx, game);
+  // Cones are lantern light: they sit above the darkness pass, clipped
+  // by the walls they cannot shine through.
+  drawVisionCones(ctx, game.level, game.guards);
   for (const guard of game.guards) drawGuard(ctx, guard, time);
   drawPlayer(ctx, game.player, time);
-  drawDarkness(ctx, game);
   ctx.restore();
   drawHud(ctx, game);
   if (game.state !== 'playing') drawOverlay(ctx, game);
